@@ -230,7 +230,7 @@ export default class StepZilla extends Component {
   }
 
   // are we allowed to move forward? via the next button or via jumpToStep?
-  stepMoveAllowed(skipValidationExecution = false) {
+  async stepMoveAllowed(skipValidationExecution = false) {
     let proceed = false;
 
     if (this.props.dontValidate) {
@@ -244,7 +244,7 @@ export default class StepZilla extends Component {
       else if (this.isStepAtIndexHOCValidationBased(this.state.compState)) {
         // the user is using a higer order component (HOC) for validation (e.g react-validation-mixin), this wraps the StepZilla steps as a HOC,
         // so use hocValidationAppliedTo to determine if this step needs the aync validation as per react-validation-mixin interface
-        proceed = this.refs.activeComponent.refs.component.isValidated();
+        proceed = await this.refs.activeComponent.refs.component.isValidated();
       }
       else if (Object.keys(this.refs).length == 0 || typeof this.refs.activeComponent.isValidated == 'undefined') {
         // if its a form component, it should have implemeted a public isValidated class (also pure componenets wont even have refs - i.e. a empty object). If not then continue
@@ -252,7 +252,7 @@ export default class StepZilla extends Component {
       }
       else {
         // user is moving forward in steps, invoke validation as its available
-        proceed = this.refs.activeComponent.isValidated();
+        proceed = await this.refs.activeComponent.isValidated();
       }
     }
 
@@ -265,7 +265,7 @@ export default class StepZilla extends Component {
 
   // a validation method is each step can be sync or async (Promise based), this utility abstracts the wrapper stepMoveAllowed to be Promise driven regardless of validation return type
   abstractStepMoveAllowedToPromise(movingBack) {
-    return Promise.resolve(this.stepMoveAllowed(movingBack));
+    return this.stepMoveAllowed(movingBack);
   }
 
   // get the classmame of steps
